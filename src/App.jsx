@@ -1,17 +1,16 @@
-import './App.css'
 import Popup from './Popup'
-import Toast from './Toast'
-import ToastManager from './Toast'
+import QToast from './QToast'
+import TestForm from './TestForm'
+import TestForm2 from './TestForm2'
 
 function App() {
 
   return (
     <>
-     <div>
-      <Popup/>
-      <ToastManager />
-      <Toast/>
-     </div>
+      <TestForm />
+      <TestForm2 />
+      {/* <Popup /> */}
+      {/* <QToast success="true" message="Coming From App" duration={3000} position="top-right" /> */}
     </>
   )
 }
