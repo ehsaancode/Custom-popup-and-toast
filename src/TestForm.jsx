@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-import QToast from "./QToast"; // Adjust the import path as needed
+import QToast from "./QToast";
 
 const TestForm = () => {
-    const [showToast, setShowToast] = useState(false);
+    // const [showToast, setShowToast] = useState(false);
 
     const handleTriggerToast = () => {
-        setShowToast(true);
+        // setShowToast(true);
+        QToast.success("Success toast notification!", {
+            position: "top-left",
+            mode: "light",
+            duration: "3000"
+        });
     };
 
     return (
@@ -19,7 +24,7 @@ const TestForm = () => {
                     Show Toast
                 </button>
 
-                <QToast
+                {/* <QToast
                     show={showToast}
                     mode="light"
                     success="true"
@@ -27,7 +32,7 @@ const TestForm = () => {
                     duration={3000}
                     position="top-right"
                     onClose={() => setShowToast(false)}
-                />
+                /> */}
             </div>
         </div>
     );

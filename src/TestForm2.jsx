@@ -3,7 +3,6 @@ import QToast from "./QToast";
 
 const TestForm2 = () => {
     const [formData, setFormData] = useState({ name: "" }); // Simple state for form input
-    const [showSuccessToast, setShowSuccessToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -15,12 +14,15 @@ const TestForm2 = () => {
             // Simulate API call or form submission
             await new Promise((resolve) => setTimeout(resolve, 800)); // Fake delay for realism
 
-            // On success, trigger toast
-            setShowSuccessToast(true);
             setFormData({ name: "" }); // Reset form
+
+            // Trigger imperatively
+            QToast.success("submitted successfully.", { mode: "dark", position: "top-left", duration: 4000 });
+
         } catch (error) {
             // Handle error (optional: show error toast)
             console.error("Submission failed:", error);
+            QToast.error("Submission failed!");
         } finally {
             setIsSubmitting(false);
         }
@@ -59,16 +61,6 @@ const TestForm2 = () => {
                     {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
             </form>
-
-            <QToast
-                show={showSuccessToast}
-                success="true"
-                mode="dark"
-                message={`submitted successfully.`}
-                duration="4000"
-                position="top-left"
-                onClose={() => setShowSuccessToast(false)}
-            />
         </div>
     );
 };
