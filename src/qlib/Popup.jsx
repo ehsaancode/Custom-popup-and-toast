@@ -17,6 +17,30 @@ const parseDuration = (dur) => {
   return value; // 'ms' or no unit
 };
 
+const isGradient = (colorStr) => {
+  if (!colorStr) return false;
+  const str = String(colorStr).trim().toLowerCase();
+  return str.startsWith("linear-gradient") || 
+         str.startsWith("radial-gradient") || 
+         str.startsWith("conic-gradient") ||
+         str.includes("-gradient");
+};
+
+const getTextStyle = (colorVal, defaultColor) => {
+  const finalColor = colorVal || defaultColor;
+  if (isGradient(finalColor)) {
+    return {
+      background: finalColor,
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      display: "inline-block",
+    };
+  }
+  return {
+    color: finalColor,
+  };
+};
+
 const Popup = ({
   position = "center",
   backgroundColor,
@@ -27,9 +51,10 @@ const Popup = ({
   messageTextColor,
   duration,
   borderRadius,
-  showTrigger = true,
   show: controlledShow,
   autoHide = "false",
+
+  showTrigger = "true",
 }) => {
   const [showPopup, setShowPopup] = useState(true);
   const [shouldRender, setShouldRender] = useState(false);
@@ -129,14 +154,15 @@ const Popup = ({
   // Backdrop animation classes (for center position only)
   const backdropVisible = isVisible ? "opacity-100" : "opacity-0";
 
-  // Color Fallbacks
-  const titleColor = titleTextColor || color || "#1f2937";
-  const messageColor = messageTextColor || color || "#4b5563";
+  // Color Fallbacks & Styles (supporting gradients)
+  const titleStyle = getTextStyle(titleTextColor || color, "#1f2937");
+  const messageStyle = getTextStyle(messageTextColor || color, "#4b5563");
   const accentColor = color || "#3b82f6"; // for button, progress bar
 
   const cardStyle = {
-    backgroundColor: backgroundColor || "#ffffff",
+    background: backgroundColor || "#ffffff",
     borderRadius: borderRadius || "0.5rem",
+    overflow: "hidden",
   };
 
   const cardPositionClass = isCenter
@@ -195,11 +221,11 @@ const Popup = ({
 
           {/* Card Content */}
           <div className="mb-4 pr-6">
-            <h3 className="text-lg font-bold mb-2" style={{ color: titleColor }}>
-              {title}
+            <h3 className="text-lg font-bold mb-2">
+              <span style={titleStyle}>{title}</span>
             </h3>
-            <p className="text-sm leading-relaxed" style={{ color: messageColor }}>
-              {message}
+            <p className="text-sm leading-relaxed">
+              <span style={messageStyle}>{message}</span>
             </p>
           </div>
 
@@ -209,8 +235,8 @@ const Popup = ({
               onClick={() => setShowPopup(false)}
               className="px-4 py-2 text-sm font-semibold rounded transition-all hover:opacity-90 active:scale-95 cursor-pointer"
               style={{
-                backgroundColor: accentColor,
-                color: backgroundColor || "#ffffff",
+                background: accentColor,
+                color: isGradient(backgroundColor) ? "#ffffff" : (backgroundColor || "#ffffff"),
                 borderRadius: borderRadius || "0.375rem",
               }}
             >
@@ -226,10 +252,9 @@ const Popup = ({
                 bottom: 0,
                 left: 0,
                 height: "4px",
-                backgroundColor: accentColor,
+                background: accentColor,
                 animation: `shrinkWidth ${parsedMs}ms linear forwards`,
                 animationPlayState: isHovered ? "paused" : "running",
-                borderBottomLeftRadius: borderRadius || "0.5rem",
               }}
             />
           )}
