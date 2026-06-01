@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import QToast from "./QToast";
+import QToast from "./qlib/QToast";
 
 const TestForm2 = () => {
     const [formData, setFormData] = useState({ name: "" }); // Simple state for form input
