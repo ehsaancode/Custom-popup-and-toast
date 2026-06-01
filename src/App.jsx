@@ -12,16 +12,18 @@ function App() {
 
       {/* <QToast /> */}
       <Popup
-        position="center"
+        position="top-left"
         backgroundColor="linear-gradient(135deg, #111827 0%, #1f2937 100%)"
         borderRadius="24px"
-        color="linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)"
+        color="green"
         autoHide="true"
         title="ehsaan"
         titleTextColor="linear-gradient(90deg, #f43f5e 0%, #fb923c 100%)"
         messageTextColor="linear-gradient(90deg, #38bdf8 0%, #818cf8 100%)"
         message="Hello, Welcome to Qlib!"
         duration="6s"
+        buttonColor="linear-gradient(90deg, #fb7185 0%, #e11d48 100%)"
+        buttonTextColor="#ffffffff"
       />
 
 

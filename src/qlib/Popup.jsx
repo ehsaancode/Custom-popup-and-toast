@@ -20,10 +20,10 @@ const parseDuration = (dur) => {
 const isGradient = (colorStr) => {
   if (!colorStr) return false;
   const str = String(colorStr).trim().toLowerCase();
-  return str.startsWith("linear-gradient") || 
-         str.startsWith("radial-gradient") || 
-         str.startsWith("conic-gradient") ||
-         str.includes("-gradient");
+  return str.startsWith("linear-gradient") ||
+    str.startsWith("radial-gradient") ||
+    str.startsWith("conic-gradient") ||
+    str.includes("-gradient");
 };
 
 const getTextStyle = (colorVal, defaultColor) => {
@@ -53,8 +53,9 @@ const Popup = ({
   borderRadius,
   show: controlledShow,
   autoHide = "false",
-
   showTrigger = "true",
+  buttonColor,
+  buttonTextColor,
 }) => {
   const [showPopup, setShowPopup] = useState(true);
   const [shouldRender, setShouldRender] = useState(false);
@@ -125,31 +126,21 @@ const Popup = ({
     }
   };
 
-  // Mapping positions to Tailwind classes
-  const positionClasses = {
-    "top-left": "top-4 left-4",
-    "top-center": "top-4 left-1/2 -translate-x-1/2",
-    "top-right": "top-4 right-4",
-    "center": "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-    "bottom-left": "bottom-4 left-4",
-    "bottom-center": "bottom-4 left-1/2 -translate-x-1/2",
-    "bottom-right": "bottom-4 right-4",
-    "left-center": "top-1/2 left-4 -translate-y-1/2",
-    "right-center": "top-1/2 right-4 -translate-y-1/2",
+  // Mapping positions to custom CSS classes for layout & transitions
+  const positionClassMap = {
+    "top-left": "popup-pos-top-left",
+    "top-center": "popup-pos-top-center",
+    "top-right": "popup-pos-top-right",
+    "center": "popup-pos-center",
+    "bottom-left": "popup-pos-bottom-left",
+    "bottom-center": "popup-pos-bottom-center",
+    "bottom-right": "popup-pos-bottom-right",
+    "left-center": "popup-pos-left-center",
+    "right-center": "popup-pos-right-center",
   };
 
-  const appliedPosition = positionClasses[position] ?? positionClasses["center"];
+  const appliedPositionClass = positionClassMap[position] ?? positionClassMap["center"];
   const isCenter = position === "center";
-
-  // Animation classes
-  let hiddenClasses = "opacity-0 scale-95";
-  if (position.includes("top")) {
-    hiddenClasses = "opacity-0 -translate-y-4 scale-95";
-  } else if (position.includes("bottom")) {
-    hiddenClasses = "opacity-0 translate-y-4 scale-95";
-  }
-  const visibleClasses = "opacity-100 scale-100 translate-y-0";
-  const animationClass = isVisible ? visibleClasses : hiddenClasses;
 
   // Backdrop animation classes (for center position only)
   const backdropVisible = isVisible ? "opacity-100" : "opacity-0";
@@ -159,15 +150,17 @@ const Popup = ({
   const messageStyle = getTextStyle(messageTextColor || color, "#4b5563");
   const accentColor = color || "#3b82f6"; // for button, progress bar
 
+  const defaultButtonTextColor = isGradient(buttonColor || accentColor)
+    ? "#ffffff"
+    : (backgroundColor || "#ffffff");
+
+  const buttonTextStyle = getTextStyle(buttonTextColor, defaultButtonTextColor);
+
   const cardStyle = {
     background: backgroundColor || "#ffffff",
     borderRadius: borderRadius || "0.5rem",
     overflow: "hidden",
   };
-
-  const cardPositionClass = isCenter
-    ? "relative"
-    : `absolute ${appliedPosition}`;
 
   if (!shouldRender) {
     return (
@@ -191,6 +184,37 @@ const Popup = ({
           from { width: 100%; }
           to { width: 0%; }
         }
+
+        .popup-card {
+          transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .popup-pos-top-left { top: 1rem; left: 1rem; transform: scale(0.95) translateY(-10px); opacity: 0; }
+        .popup-pos-top-left.popup-visible { transform: scale(1) translateY(0); opacity: 1; }
+        
+        .popup-pos-top-center { top: 1rem; left: 50%; transform: translateX(-50%) scale(0.95) translateY(-10px); opacity: 0; }
+        .popup-pos-top-center.popup-visible { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+        
+        .popup-pos-top-right { top: 1rem; right: 1rem; transform: scale(0.95) translateY(-10px); opacity: 0; }
+        .popup-pos-top-right.popup-visible { transform: scale(1) translateY(0); opacity: 1; }
+        
+        .popup-pos-center { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+        .popup-pos-center.popup-visible { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        
+        .popup-pos-bottom-left { bottom: 1rem; left: 1rem; transform: scale(0.95) translateY(10px); opacity: 0; }
+        .popup-pos-bottom-left.popup-visible { transform: scale(1) translateY(0); opacity: 1; }
+        
+        .popup-pos-bottom-center { bottom: 1rem; left: 50%; transform: translateX(-50%) scale(0.95) translateY(10px); opacity: 0; }
+        .popup-pos-bottom-center.popup-visible { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+        
+        .popup-pos-bottom-right { bottom: 1rem; right: 1rem; transform: scale(0.95) translateY(10px); opacity: 0; }
+        .popup-pos-bottom-right.popup-visible { transform: scale(1) translateY(0); opacity: 1; }
+        
+        .popup-pos-left-center { top: 50%; left: 1rem; transform: translateY(-50%) scale(0.95) translateX(-10px); opacity: 0; }
+        .popup-pos-left-center.popup-visible { transform: translateY(-50%) scale(1) translateX(0); opacity: 1; }
+        
+        .popup-pos-right-center { top: 50%; right: 1rem; transform: translateY(-50%) scale(0.95) translateX(10px); opacity: 0; }
+        .popup-pos-right-center.popup-visible { transform: translateY(-50%) scale(1) translateX(0); opacity: 1; }
       `}</style>
 
       {/* Backdrop or transparent container */}
@@ -205,7 +229,7 @@ const Popup = ({
         <div
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className={`relative p-6 shadow-2xl w-96 max-w-[90vw] z-50 pointer-events-auto transition-all duration-300 ease-out transform ${cardPositionClass} ${animationClass}`}
+          className={`absolute p-6 shadow-2xl w-96 max-w-[90vw] z-50 pointer-events-auto popup-card ${appliedPositionClass} ${isVisible ? "popup-visible" : ""}`}
           style={cardStyle}
         >
           {/* Top-right close icon */}
@@ -235,12 +259,11 @@ const Popup = ({
               onClick={() => setShowPopup(false)}
               className="px-4 py-2 text-sm font-semibold rounded transition-all hover:opacity-90 active:scale-95 cursor-pointer"
               style={{
-                background: accentColor,
-                color: isGradient(backgroundColor) ? "#ffffff" : (backgroundColor || "#ffffff"),
+                background: buttonColor || accentColor,
                 borderRadius: borderRadius || "0.375rem",
               }}
             >
-              Close
+              <span style={buttonTextStyle}>Close</span>
             </button>
           </div>
 
