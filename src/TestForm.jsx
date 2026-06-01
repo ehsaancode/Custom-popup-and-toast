@@ -8,7 +8,7 @@ const TestForm = () => {
         // setShowToast(true);
         QToast.success("Success toast notification!", {
             position: "top-left",
-            mode: "light",
+            mode: "dark",
             duration: "3000"
         });
     };

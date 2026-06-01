@@ -18,8 +18,18 @@ const PRESETS = {
     bg: "bg-green-200",
     text: "text-green-600",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="3"
+          d="M5 13l4 4L19 7"
+        />
       </svg>
     ),
   },
@@ -27,8 +37,18 @@ const PRESETS = {
     bg: "bg-red-200",
     text: "text-red-600",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="3"
+          d="M6 18L18 6M6 6l12 12"
+        />
       </svg>
     ),
   },
@@ -36,8 +56,18 @@ const PRESETS = {
     bg: "bg-blue-200",
     text: "text-blue-600",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="3"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     ),
   },
@@ -45,8 +75,18 @@ const PRESETS = {
     bg: "bg-yellow-200",
     text: "text-yellow-600",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="3"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        />
       </svg>
     ),
   },
@@ -134,7 +174,6 @@ const ToastItem = ({
       className={`relative flex items-center justify-between max-w-sm w-auto min-w-[300px] px-4 py-2 rounded-xl shadow-lg z-50 pointer-events-auto ${themeClasses} ${transitionClasses} ${isVisible ? visibleClasses : hiddenClasses}`}
     >
       <div className="flex items-center gap-3 overflow-hidden">
-
         {/*Icon Wrapper with shrink-0*/}
         <div
           className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full ${stylePreset.bg} ${stylePreset.text} transition-transform duration-500 delay-100 ${isVisible ? "scale-100 rotate-0" : "scale-0 -rotate-90"}`}
@@ -161,7 +200,10 @@ const ToastContainer = () => {
   useEffect(() => {
     return toastEvents.subscribe((event) => {
       if (event.type === "ADD") {
-        setToasts((prev) => [...prev, { ...event.payload, id: Date.now() + Math.random() }]);
+        setToasts((prev) => [
+          ...prev,
+          { ...event.payload, id: Date.now() + Math.random() },
+        ]);
       }
     });
   }, []);
@@ -215,20 +257,30 @@ const QToast = (props) => {
 };
 
 QToast.success = (message, options = {}) =>
-  toastEvents.emit({ type: "ADD", payload: { message, type: "success", ...options } });
+  toastEvents.emit({
+    type: "ADD",
+    payload: { message, type: "success", ...options },
+  });
 
 QToast.error = (message, options = {}) =>
-  toastEvents.emit({ type: "ADD", payload: { message, type: "error", ...options } });
+  toastEvents.emit({
+    type: "ADD",
+    payload: { message, type: "error", ...options },
+  });
 
 QToast.info = (message, options = {}) =>
-  toastEvents.emit({ type: "ADD", payload: { message, type: "info", ...options } });
+  toastEvents.emit({
+    type: "ADD",
+    payload: { message, type: "info", ...options },
+  });
 
 QToast.warning = (message, options = {}) =>
-  toastEvents.emit({ type: "ADD", payload: { message, type: "warning", ...options } });
-
+  toastEvents.emit({
+    type: "ADD",
+    payload: { message, type: "warning", ...options },
+  });
 
 QToast.show = (message, options = {}) =>
   toastEvents.emit({ type: "ADD", payload: { message, ...options } });
 
 export default QToast;
-
