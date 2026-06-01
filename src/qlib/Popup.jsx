@@ -44,7 +44,6 @@ const getTextStyle = (colorVal, defaultColor) => {
 const Popup = ({
   position = "center",
   backgroundColor,
-  color, // general text/accent color fallback
   title = "Popup",
   titleTextColor,
   message = "",
@@ -56,6 +55,7 @@ const Popup = ({
   showTrigger = "true",
   buttonColor,
   buttonTextColor,
+  progressColor,
 }) => {
   const [showPopup, setShowPopup] = useState(true);
   const [shouldRender, setShouldRender] = useState(false);
@@ -146,11 +146,11 @@ const Popup = ({
   const backdropVisible = isVisible ? "opacity-100" : "opacity-0";
 
   // Color Fallbacks & Styles (supporting gradients)
-  const titleStyle = getTextStyle(titleTextColor || color, "#1f2937");
-  const messageStyle = getTextStyle(messageTextColor || color, "#4b5563");
-  const accentColor = color || "#3b82f6"; // for button, progress bar
+  const titleStyle = getTextStyle(titleTextColor, "#1f2937");
+  const messageStyle = getTextStyle(messageTextColor, "#4b5563");
+  const defaultAccentColor = "#3b82f6"; // default blue accent
 
-  const defaultButtonTextColor = isGradient(buttonColor || accentColor)
+  const defaultButtonTextColor = isGradient(buttonColor || defaultAccentColor)
     ? "#ffffff"
     : (backgroundColor || "#ffffff");
 
@@ -259,7 +259,7 @@ const Popup = ({
               onClick={() => setShowPopup(false)}
               className="px-4 py-2 text-sm font-semibold rounded transition-all hover:opacity-90 active:scale-95 cursor-pointer"
               style={{
-                background: buttonColor || accentColor,
+                background: buttonColor || defaultAccentColor,
                 borderRadius: borderRadius || "0.375rem",
               }}
             >
@@ -275,7 +275,7 @@ const Popup = ({
                 bottom: 0,
                 left: 0,
                 height: "4px",
-                background: accentColor,
+                background: progressColor || defaultAccentColor,
                 animation: `shrinkWidth ${parsedMs}ms linear forwards`,
                 animationPlayState: isHovered ? "paused" : "running",
               }}

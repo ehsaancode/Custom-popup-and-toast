@@ -15,7 +15,6 @@ function App() {
         position="top-left"
         backgroundColor="linear-gradient(135deg, #111827 0%, #1f2937 100%)"
         borderRadius="24px"
-        color="green"
         autoHide="true"
         title="ehsaan"
         titleTextColor="linear-gradient(90deg, #f43f5e 0%, #fb923c 100%)"
@@ -24,6 +23,7 @@ function App() {
         duration="6s"
         buttonColor="linear-gradient(90deg, #fb7185 0%, #e11d48 100%)"
         buttonTextColor="#ffffffff"
+        progressColor="linear-gradient(90deg, #e20f4bff 0%, #df9c1eff 100%)"
       />
 
 
