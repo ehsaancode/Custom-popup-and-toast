@@ -7,7 +7,7 @@ const TestForm = () => {
     const handleTriggerToast = () => {
         // setShowToast(true);
         QToast.success("Success toast notification!", {
-            position: "top-left",
+            position: "top-right",
             mode: "dark",
             duration: "3000"
         });
@@ -23,8 +23,8 @@ const TestForm = () => {
                 >
                     Show Toast
                 </button>
-
-                {/* <QToast
+                {/* 
+                <QToast
                     show={showToast}
                     mode="light"
                     success="true"

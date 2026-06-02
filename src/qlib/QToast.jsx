@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const toastEvents = {
   listeners: [],
@@ -92,61 +92,117 @@ const PRESETS = {
   },
 };
 
+const parseDuration = (dur) => {
+  if (dur === undefined || dur === null) return null;
+  if (typeof dur === 'number') return dur;
+  const str = String(dur).trim().toLowerCase();
+
+  const match = str.match(/^(\d+(?:\.\d+)?)\s*(ms|s|m)?$/);
+  if (!match) return null;
+
+  const value = parseFloat(match[1]);
+  const unit = match[2];
+
+  if (unit === 's') return value * 1000;
+  if (unit === 'm') return value * 60000;
+  return value; // 'ms' or no unit
+};
+
+const isGradient = (colorStr) => {
+  if (!colorStr) return false;
+  const str = String(colorStr).trim().toLowerCase();
+  return str.startsWith("linear-gradient") ||
+    str.startsWith("radial-gradient") ||
+    str.startsWith("conic-gradient") ||
+    str.includes("-gradient");
+};
+
+const getTextStyle = (colorVal, defaultColor) => {
+  const finalColor = colorVal || defaultColor;
+  if (isGradient(finalColor)) {
+    return {
+      background: finalColor,
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      display: "inline-block",
+    };
+  }
+  return {
+    color: finalColor,
+  };
+};
+
 // Toast Item Component
 const ToastItem = ({
   message = "Default Toast Message",
   duration = 3000,
   position = "top-right",
   type = "success",
-  show = true,
   mode = "light",
+  backgroundColor,
+  borderRadius,
+  title,
+  titleTextColor,
+  messageTextColor,
+  buttonColor,
+  buttonTextColor,
+  progressColor,
   onClose,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [shouldRender, setShouldRender] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const expiryTimeRef = React.useRef(0);
-  const timerRef = React.useRef(null);
+  const expiryTimeRef = useRef(0);
+  const timerRef = useRef(null);
+
+  const parsedMs = parseDuration(duration);
+  const safeDuration = parsedMs !== null ? parsedMs : 3000;
 
   const stylePreset = PRESETS[type] || PRESETS.success;
 
-  const handleShow = () => {
-    setShouldRender(true);
-    setTimeout(() => {
+  // Trigger entry transition on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 10);
-  };
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
     setTimeout(() => {
-      setShouldRender(false);
       if (onClose) onClose();
     }, 300);
   };
 
-  const safeDuration = parseInt(duration, 10) || 3000;
+  const startTimer = (timeRemaining) => {
+    if (timeRemaining && timeRemaining > 0) {
+      expiryTimeRef.current = Date.now() + timeRemaining;
+      timerRef.current = setTimeout(handleClose, timeRemaining);
+    }
+  };
 
   useEffect(() => {
-    if (show) handleShow();
-    else handleClose();
-  }, [show]);
-
-  useEffect(() => {
-    if (isVisible && safeDuration) {
-      expiryTimeRef.current = Date.now() + safeDuration;
-      timerRef.current = setTimeout(handleClose, safeDuration);
+    if (isVisible && !isHovered && safeDuration > 0) {
+      startTimer(safeDuration);
     }
     return () => clearTimeout(timerRef.current);
-  }, [isVisible, safeDuration]);
+  }, [isVisible, isHovered, safeDuration]);
 
-  const handleMouseEnter = () => clearTimeout(timerRef.current);
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    clearTimeout(timerRef.current);
+  };
 
   const handleMouseLeave = () => {
-    if (isVisible) {
+    setIsHovered(false);
+    if (isVisible && safeDuration > 0) {
       const remainingTime = expiryTimeRef.current - Date.now();
-      if (remainingTime <= 0) handleClose();
-      else timerRef.current = setTimeout(handleClose, remainingTime);
+      if (remainingTime <= 0) {
+        handleClose();
+      } else {
+        startTimer(remainingTime);
+      }
     }
   };
 
@@ -165,40 +221,84 @@ const ToastItem = ({
     ? "bg-gray-800 text-white shadow-black/50"
     : "bg-white text-black shadow-gray-500";
 
-  if (!show && !shouldRender) return null;
+  const titleStyle = titleTextColor ? getTextStyle(titleTextColor) : {};
+  const messageStyle = messageTextColor ? getTextStyle(messageTextColor) : {};
+
+  const containerStyle = {
+    ...(backgroundColor ? { background: backgroundColor } : {}),
+    ...(borderRadius ? { borderRadius } : {}),
+    overflow: "hidden",
+  };
 
   return (
     <div
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`relative flex items-center justify-between max-w-sm w-auto min-w-[300px] px-4 py-2 rounded-xl shadow-lg z-50 pointer-events-auto ${themeClasses} ${transitionClasses} ${isVisible ? visibleClasses : hiddenClasses}`}
+      style={containerStyle}
+      className={`relative flex items-center justify-between max-w-sm w-auto min-w-[300px] px-4 py-3 rounded-xl shadow-lg z-50 pointer-events-auto ${themeClasses} ${transitionClasses} ${isVisible ? visibleClasses : hiddenClasses}`}
     >
-      <div className="flex items-center gap-3 overflow-hidden">
-        {/*Icon Wrapper with shrink-0*/}
+      <div className="flex items-start gap-3 overflow-hidden mr-2">
         <div
-          className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full ${stylePreset.bg} ${stylePreset.text} transition-transform duration-500 delay-100 ${isVisible ? "scale-100 rotate-0" : "scale-0 -rotate-90"}`}
+          className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full mt-0.5 ${stylePreset.bg} ${stylePreset.text} transition-transform duration-500 delay-100 ${isVisible ? "scale-100 rotate-0" : "scale-0 -rotate-90"}`}
         >
           {stylePreset.icon}
         </div>
 
-        <span className="break-words text-sm">{message}</span>
+        <div className="flex flex-col overflow-hidden">
+          {title && (
+            <span style={titleStyle} className="font-bold text-sm leading-tight mb-0.5">
+              {title}
+            </span>
+          )}
+          <span style={messageStyle} className="break-words text-sm leading-normal">
+            {message}
+          </span>
+        </div>
       </div>
+
       <button
         onClick={handleClose}
-        className={`rounded-full p-1 hover:transition hover:text-red-500 ${isDarkMode ? "text-gray-400" : "text-gray-900"}`}
+        style={{
+          background: buttonColor || "transparent",
+          color: buttonTextColor || (isDarkMode ? "#9ca3af" : "#111827"),
+        }}
+        className="rounded-full w-6 h-6 flex items-center justify-center hover:opacity-80 active:scale-95 transition-all text-lg cursor-pointer shrink-0"
       >
         ×
       </button>
+
+      {/* Shrinking progress bar */}
+      {safeDuration > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            height: "4px",
+            background: progressColor || (stylePreset.text ? "currentColor" : "#10b981"),
+            animation: `shrinkWidth ${safeDuration}ms linear forwards`,
+            animationPlayState: isHovered ? "paused" : "running",
+          }}
+          className={stylePreset.text || ""}
+        />
+      )}
     </div>
   );
 };
 
+let containerCount = 0;
+
 // Toast Container
 const ToastContainer = () => {
   const [toasts, setToasts] = useState([]);
+  const [isPrimary, setIsPrimary] = useState(false);
 
   useEffect(() => {
-    return toastEvents.subscribe((event) => {
+    containerCount++;
+    if (containerCount === 1) {
+      setIsPrimary(true);
+    }
+    const unsubscribe = toastEvents.subscribe((event) => {
       if (event.type === "ADD") {
         setToasts((prev) => [
           ...prev,
@@ -206,7 +306,13 @@ const ToastContainer = () => {
         ]);
       }
     });
+    return () => {
+      containerCount--;
+      unsubscribe();
+    };
   }, []);
+
+  if (!isPrimary) return null;
 
   const removeToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -233,6 +339,12 @@ const ToastContainer = () => {
 
   return (
     <>
+      <style>{`
+        @keyframes shrinkWidth {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
       {Object.entries(groupedToasts).map(([pos, toastsInGroup]) => (
         <div
           key={pos}
@@ -252,8 +364,83 @@ const ToastContainer = () => {
 };
 
 // Main Export
-const QToast = (props) => {
-  return <ToastContainer {...props} />;
+const QToast = ({
+  position = "top-right",
+  backgroundColor,
+  borderRadius,
+  title,
+  showTrigger = "false",
+  titleTextColor,
+  messageTextColor,
+  message,
+  duration,
+  buttonColor,
+  buttonTextColor,
+  progressColor,
+  success,
+  error,
+  info,
+  warning,
+  type,
+  onClose,
+  mode,
+  ...rest
+}) => {
+  const shouldShowTrigger = showTrigger === true || showTrigger === "true";
+
+  const triggerToast = () => {
+    let resolvedType = type || "success";
+    if (success === true || success === "true") resolvedType = "success";
+    else if (error === true || error === "true") resolvedType = "error";
+    else if (info === true || info === "true") resolvedType = "info";
+    else if (warning === true || warning === "true") resolvedType = "warning";
+
+    toastEvents.emit({
+      type: "ADD",
+      payload: {
+        message: message || "Default Toast Message",
+        position,
+        backgroundColor,
+        borderRadius,
+        title,
+        titleTextColor,
+        messageTextColor,
+        duration,
+        buttonColor,
+        buttonTextColor,
+        progressColor,
+        type: resolvedType,
+        mode,
+        onClose,
+        ...rest,
+      },
+    });
+  };
+
+  // Trigger once on mount if there's no trigger button
+  useEffect(() => {
+    if (message && !shouldShowTrigger) {
+      triggerToast();
+    }
+  }, [message]);
+
+  return (
+    <>
+      <ToastContainer />
+      {shouldShowTrigger && (
+        <button
+          onClick={triggerToast}
+          style={{
+            background: buttonColor || "#059669",
+            color: buttonTextColor || "#ffffff",
+          }}
+          className="fixed bottom-16 left-1/2 -translate-x-1/2 px-5 py-2.5 font-medium rounded-lg transition-all shadow-md hover:shadow-lg active:scale-95 z-40 pointer-events-auto cursor-pointer"
+        >
+          Show Toast
+        </button>
+      )}
+    </>
+  );
 };
 
 QToast.success = (message, options = {}) =>

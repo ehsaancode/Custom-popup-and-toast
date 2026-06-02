@@ -46,7 +46,7 @@ const Popup = ({
   backgroundColor,
   title = "Popup",
   titleTextColor,
-  message = "",
+  message = "Your message here.",
   messageTextColor,
   duration,
   borderRadius,

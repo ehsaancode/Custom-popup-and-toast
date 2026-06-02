@@ -10,24 +10,39 @@ function App() {
       {/* <TestForm /> */}
       <TestForm2 />
 
-      {/* <QToast /> */}
+      <QToast />
       <Popup
         position="top-left"
         backgroundColor="linear-gradient(135deg, #111827 0%, #1f2937 100%)"
-        borderRadius="24px"
+        borderRadius="30px"
         autoHide="true"
-        title="ehsaan"
+        title="Ehsaan"
+        showTrigger="true"
         titleTextColor="linear-gradient(90deg, #f43f5e 0%, #fb923c 100%)"
         messageTextColor="linear-gradient(90deg, #38bdf8 0%, #818cf8 100%)"
         message="Hello, Welcome to Qlib!"
         duration="6s"
-        buttonColor="linear-gradient(90deg, #fb7185 0%, #e11d48 100%)"
+        buttonColor="linear-gradient(90deg, #5942cfff 0%, #e11d48 100%)"
         buttonTextColor="#ffffffff"
         progressColor="linear-gradient(90deg, #e20f4bff 0%, #df9c1eff 100%)"
       />
 
 
-      {/* <QToast success="true" message="Coming From App" duration={3000} position="top-right" /> */}
+      <QToast
+        // position="top-left"
+        // backgroundColor="linear-gradient(135deg, #111827 0%, #1f2937 100%)"
+        // borderRadius="8px"
+        // // autoHide="true"
+        // title="Ehsaan"
+        showTrigger="true"
+      // titleTextColor="linear-gradient(90deg, #f43f5e 0%, #fb923c 100%)"
+      // messageTextColor="linear-gradient(90deg, #38bdf8 0%, #818cf8 100%)"
+      // message="Hello, Welcome to Qlib Toast!"
+      // duration="6s"
+      // // buttonColor="linear-gradient(90deg, #5942cfff 0%, #e11d48 100%)"
+      // buttonTextColor="#ffffffff"
+      // progressColor="linear-gradient(90deg, #e20f4bff 0%, #df9c1eff 100%)"
+      />
     </>
   )
 }
